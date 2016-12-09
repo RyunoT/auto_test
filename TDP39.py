@@ -5,9 +5,6 @@ TDP-39XXのUSB通信制御用プログラムです
 """
 # Date: ${YEAR}/${MONTH}/${DAY}
 # Filename: ${NAME}
-__author__ = 'RyunosukeT'
-__date__ = '2016/12/9'
-__version__ = '0.1'
 
 
 import serial
@@ -18,12 +15,14 @@ class RS232C(object):
     """
     RS232C通信を制御するクラス、自動テスト向き
     """
-    serialport = None  # TDP39XXとつながるシリアルポート、オブジェクト
-    response = None
+
+    def __init__(self):
+        self.serialport = None  # TDP39XXとつながるシリアルポート、オブジェクト
+        self.response = None
 
     def serial_open(self, port_number):
         self.serialport = serial.Serial(port=port_number, baudrate=2400, bytesize=8,
-                                        parity='N', stopbits=1, timeout=1, write_timeout=1)
+                                        parity='N', stopbits=1, timeout=1)
 
     def serial_close(self):
         self.serialport.close()
@@ -81,3 +80,6 @@ if __name__ == '__main__':  # コード作成時のテスト用
     response = response[:8]
     print(response)
 
+__author__ = 'RyunosukeT'
+__date__ = '2016/12/9'
+__version__ = '0.1'

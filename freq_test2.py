@@ -5,9 +5,6 @@ teststand
 """
 # Date: ${YEAR}/${MONTH}/${DAY}
 # Filename: ${NAME}
-__author__ = 'RyunosukeT'
-__date__ = '2016/12/9'
-__version__ = '0.1'
 
 
 
@@ -73,3 +70,6 @@ print(a)
 #for x in data_list:
 #    print(x)
 
+__author__ = 'RyunosukeT'
+__date__ = '2016/12/9'
+__version__ = '0.1'

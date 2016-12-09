@@ -5,9 +5,6 @@ QP-3(X)のUSB通信制御用プログラムです
 """
 # Date: ${YEAR}/${MONTH}/${DAY}
 # Filename: ${NAME}
-__author__ = 'RyunosukeT'
-__date__ = '2016/12/9'
-__version__ = '0.1'
 
 import serial
 import time
@@ -18,12 +15,13 @@ class USB(object):
     USB通信を制御するクラス、自動テスト向き
     """
 
-    serialport = None  # QP-3と繋がるシリアルポート、オブジェクト
-    response = None  # QP-3からのレスポンス
+    def __init__(self):
+        self.serialport = None  # QP-3と繋がるシリアルポート、オブジェクト
+        self.response = None  # QP-3からのレスポンス
 
     def serial_open(self, port_number):
         self.serialport = serial.Serial(port=port_number, baudrate=9600, bytesize=8, parity='N',
-                                        stopbits=1, timeout=0.1, write_timeout=0.1)
+                                        stopbits=1, timeout=0.1)
 
     def serial_close(self):
         self.serialport.close()
@@ -38,8 +36,7 @@ class USB(object):
             print(self.response)
 
     def oscillator_ABorBA_setup(self, AB_BA):
-        """オシレータモードAB相/BA相セットアップ選択、0または1"""
-        AB_BA = AB_BA.encode('utf-8')  # ABなら0、BAなら1
+        """オシレータモードAB相/BA相セットアップ選択、ABなら0、BAなら1"""
         self.com('G0+050\r')
         self.com('G1+000\r')
         self.com('G2' + AB_BA + '\r')
@@ -75,3 +72,6 @@ if __name__ == '__main__':  # コード作成時のテスト用
     response = 0
     print(response)
 
+__author__ = 'RyunosukeT'
+__date__ = '2016/12/9'
+__version__ = '0.1'
