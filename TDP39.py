@@ -14,7 +14,7 @@ import serial
 import time
 
 
-class RS232C:
+class RS232C(object):
     """
     RS232C通信を制御するクラス、自動テスト向き
     """
@@ -54,7 +54,7 @@ class RS232C:
     def data_stop(self):
         """データ垂れ流しをストップ"""
         self.com('S')
-        time.sleep(1)  # データストップのコマンドを送ってから応答時間が必要でしょ
+        time.sleep(1)  # データストップのコマンドを送ってから応答時間が必要でしょ？
 
     def program_in(self):
         """Hello program mode"""
@@ -64,9 +64,9 @@ class RS232C:
         """Goodbye program mode"""
         self.com('E\r')
 
-    def refresh_time(self, time):
+    def refresh_time_setup(self, refresh_time):
         """koushin_time"""
-        command = str('WP04,' + time + '\r')
+        command = str('WP04,' + refresh_time + '\r')
         self.com(command)
 
     def pulse_mode(self, mode):

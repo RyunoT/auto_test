@@ -13,7 +13,7 @@ import serial
 import time
 
 
-class USB:
+class USB(object):
     """
     USB通信を制御するクラス、自動テスト向き
     """
@@ -71,4 +71,7 @@ class USB:
         command = 'E\r'
         self.com(command)
 
+if __name__ == '__main__':  # コード作成時のテスト用
+    response = 0
+    print(response)
 
