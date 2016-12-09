@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-teststand
+teststandで実行するプログラム
+一番下でポートだけを書き換えれば汎用的に使える
 """
 # Date: ${YEAR}/${MONTH}/${DAY}
 # Filename: ${NAME}
@@ -13,70 +14,54 @@ import TDP39
 import QP3
 import sys
 
+
 class Frequency_test(object):
     """
     周波数テスト
     """
+    tdp39_rs232c = TDP39.RS232C()  # クラス変数、なぜクラス変数なのか理由は（よくわから）ない
+    qp3_usb = QP3.USB()  # クラス変数、なぜクラス変数なのか理由は（よくわから）ない
+
     def __init__(self):
         self.data_list = []
-        self.numbers = input()  # 'Enter range' (separate with commas):
-        self.test_freq = self.numbers
+        self.test_frequency = input()  # 'Enter range' (separate with commas):とでも書きたいところ
 
-    TDP39_RS232C = TDP39.RS232C()
-    QP3_USB = QP3.USB()
+    def TDP_input_mode_test(self, mode):
+        """TDP39の入力モードを変更できるテスト"""
+        mode_test_TDP39_RS232C = Frequency_test.tdp39_rs232c  # 便宜的に名前を変更
+        mode_test_QP3_USB = Frequency_test.qp3_usb  # 便宜的に名前を変更
 
-    def TDP_mode(self, mode):
-        TDP39_RS232C = Frequency_test.TDP39_RS232C
-        QP3_USB = Frequency_test.QP3_USB
+        mode_test_TDP39_RS232C.program_in()
+        mode_test_TDP39_RS232C.refresh_time_setup('0.1')  # 更新時間を設定
+        mode_test_TDP39_RS232C.pulse_mode(mode)
+        mode_test_TDP39_RS232C.program_out()
+        mode_test_TDP39_RS232C.data_stop()
 
-        TDP39_RS232C.program_in()
-        TDP39_RS232C.refresh_time_setup('0.1')
-        TDP39_RS232C.pulse_mode(mode)
-        TDP39_RS232C.program_out()
-        TDP39_RS232C.data_stop()
+        mode_test_QP3_USB.oscillator(self.test_frequency)
+        mode_test_TDP39_RS232C.read_only_number()
+        self.data_list.append(mode_test_TDP39_RS232C.response.decode('utf-8'))  # 計測結果はdata_listに格納
 
-        QP3_USB.oscillator(self.test_freq)
-        TDP39_RS232C.read()
-        self.data_list.append(TDP39_RS232C.response.decode('utf-8'))
+    def main_test(self, TDP_port, QP3_port):
+        """テストのメインプログラム、一番下で実行されているのはコイツ"""
+        Frequency_test.qp3_usb.serial_open(QP3_port)  # windowsで変更 TAHARA1-PCではCOM6
+        Frequency_test.tdp39_rs232c.serial_open(TDP_port)  # windowsで変更 TAHARA1-PCではCOM5
+        Frequency_test.tdp39_rs232c.data_stop()
 
-    def main_test(self):
-        TDP39_RS232C = Frequency_test.TDP39_RS232C
-        QP3_USB = Frequency_test.QP3_USB
+        Frequency_test.qp3_usb.program_in()
 
-        QP3_USB.serial_open('/dev/tty.usbserial-A501YZDP')  # windowsで変更 TAHARA1-PCではCOM6
-        TDP39_RS232C.serial_open('/dev/tty.usbserial-FTZ2FBLI')  # windowsで変更 TAHARA1-PCではCOM5
-        TDP39_RS232C.data_stop()
+        Frequency_test.qp3_usb.oscillator_AB_setup()  # QP3をセットアップ
+        self.TDP_input_mode_test('0')  # TDP39をテスト
 
-        QP3_USB.program_in()
+        Frequency_test.qp3_usb.program_out()
 
-        QP3_USB.oscillator_AB_setup()
-        self.TDP_mode('0')
+        Frequency_test.qp3_usb.serial_close()
+        Frequency_test.tdp39_rs232c.serial_close()
 
-        '''ひとまず消去
-        QP3_USB.oscillator_AB_setup()
-        TDP_mode('1')
-        QP3_USB.oscillator_BA_setup()
-        TDP_mode('1')
+        print(self.data_list[0]) # data_listの0番目を出力
 
-        QP3_USB.oscillator_AB_setup()
-        TDP_mode('2')
-        QP3_USB.oscillator_BA_setup()
-        TDP_mode('2')
-        '''
 
-        QP3_USB.program_out()
-
-        QP3_USB.serial_close()
-        TDP39_RS232C.serial_close()
-
-        a = self.data_list[0]
-        print(a)
-
-b = Frequency_test()
-b.main_test()
-
-        # for x in data_list:
-    #    print(x)
+a = Frequency_test()
+a.main_test('/dev/tty.usbserial-FTZ2FBLI', '/dev/tty.usbserial-A501YZDP')  # ポートだけ設定して実行
 
 
 __author__ = 'RyunosukeT'

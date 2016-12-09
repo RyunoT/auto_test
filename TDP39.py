@@ -36,19 +36,10 @@ class RS232C(object):
         if __name__ == '__main__':  # コード作成時のテスト用
             print(self.response)
 
-    def read(self):
+    def read_only_number(self):
+        """表示器の数字のみを読み込む、具体的には\r\n（CRLF）を削除する"""
         self.com('O')
         self.response = self.response[:8]
-        """
-        変更しました、未テスト
-        command = 'O'
-        command = command.encode('utf-8')
-        self.serialport.reset_input_buffer()
-        self.serialport.write(command)
-        self.response = self.serialport.read(8)
-        if __name__ == '__main__':  # コード作成時のテスト用
-            print(self.response)
-        """
 
     def data_stop(self):
         """データ垂れ流しをストップ"""
@@ -64,7 +55,7 @@ class RS232C(object):
         self.com('E\r')
 
     def refresh_time_setup(self, refresh_time):
-        """koushin_time"""
+        """更新時間をセットアップ"""
         command = str('WP04,' + refresh_time + '\r')
         self.com(command)
 
