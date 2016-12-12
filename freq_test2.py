@@ -27,24 +27,21 @@ class Frequency_test(object):
         self.test_frequency = input()  # 'Enter range' (separate with commas):とでも書きたいところ
 
     def TDP_input_mode_test(self, mode):
-        """TDP39の入力モードを変更できるテスト"""
-        mode_test_TDP39_RS232C = Frequency_test.tdp39_rs232c  # 便宜的に名前を変更
-        mode_test_QP3_USB = Frequency_test.qp3_usb  # 便宜的に名前を変更
+        """TDP39の入力モードを変更できる周波数テストのインスタンス"""
+        Frequency_test.tdp39_rs232c.program_in()
+        Frequency_test.tdp39_rs232c.refresh_time_setup('0.1')  # 更新時間を設定
+        Frequency_test.tdp39_rs232c.pulse_mode(mode)  # [0, 1, 2] で入力モードを設定
+        Frequency_test.tdp39_rs232c.program_out()
+        Frequency_test.tdp39_rs232c.data_stop()
 
-        mode_test_TDP39_RS232C.program_in()
-        mode_test_TDP39_RS232C.refresh_time_setup('0.1')  # 更新時間を設定
-        mode_test_TDP39_RS232C.pulse_mode(mode)
-        mode_test_TDP39_RS232C.program_out()
-        mode_test_TDP39_RS232C.data_stop()
-
-        mode_test_QP3_USB.oscillator(self.test_frequency)
-        mode_test_TDP39_RS232C.read_only_number()
-        self.data_list.append(mode_test_TDP39_RS232C.response.decode('utf-8'))  # 計測結果はdata_listに格納
+        Frequency_test.qp3_usb.oscillator(self.test_frequency)
+        Frequency_test.tdp39_rs232c.read_only_number()
+        self.data_list.append(Frequency_test.tdp39_rs232c.response.decode('utf-8'))  # 計測結果はdata_listに格納
 
     def main_test(self, TDP_port, QP3_port):
         """テストのメインプログラム、一番下で実行されているのはコイツ"""
-        Frequency_test.qp3_usb.serial_open(QP3_port)  # windowsで変更 TAHARA1-PCではCOM6
-        Frequency_test.tdp39_rs232c.serial_open(TDP_port)  # windowsで変更 TAHARA1-PCではCOM5
+        Frequency_test.qp3_usb.serial_open(QP3_port)
+        Frequency_test.tdp39_rs232c.serial_open(TDP_port)
         Frequency_test.tdp39_rs232c.data_stop()
 
         Frequency_test.qp3_usb.program_in()
@@ -57,10 +54,11 @@ class Frequency_test(object):
         Frequency_test.qp3_usb.serial_close()
         Frequency_test.tdp39_rs232c.serial_close()
 
-        print(self.data_list[0]) # data_listの0番目を出力
+        print(self.data_list[0])  # data_listの0番目を出力
 
 
-a = Frequency_test()
+a = Frequency_test()  # メインプログラムの呼び出し
+# windowsで変更 TAHARA1-PCではCOM6、TAHARA1-PCではCOM5
 a.main_test('/dev/tty.usbserial-FTZ2FBLI', '/dev/tty.usbserial-A501YZDP')  # ポートだけ設定して実行
 
 

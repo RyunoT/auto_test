@@ -65,11 +65,43 @@ class RS232C(object):
         self.com(command)
 
 
+class RS485(RS232C):
+    """RS485通信を制御するクラス、RS232Cクラスを継承、serialportとresponseを標準装備"""
+
+    def __init__(self, address):
+        RS232C.__init__(self)
+        self.address = address
+
+    def serial_open(self, port_number):
+        self.serialport = serial.Serial(port=port_number, baudrate=9600, bytesize=8,
+                                        parity='N', stopbits=1, timeout=1)
+
+    def com(self, command):
+        """汎用コマンド制御"""
+        all_command = ('\x05' + self.address + command + '\r\n')
+        self.serialport.reset_input_buffer()
+        self.serialport.write(all_command.encode('utf-8'))
+        self.response = self.serialport.readlines()  # readline → readlinesに変更
+        if __name__ == '__main__':  # コード作成時のテスト用
+            print(self.response)
+
+    def read_only_number(self):
+        """表示器の数字のみを読み込む"""
+        self.com('DQ')
+        print(a.response[1][3:11])
+
+
 if __name__ == '__main__':  # コード作成時のテスト用
-    response = '9000000000000\r\n'
-    print(response)
-    response = response[:8]
-    print(response)
+    a = RS485('00')
+    a.serial_open('/dev/tty.usbserial-00001014')
+    a.read_only_number()
+    a.serial_close()
+
+"""    b = RS232C()
+    b.serial_open('/dev/tty.usbserial-FTZ2FBLI')
+    b.com('O')
+    b.serial_close()
+"""
 
 __author__ = 'RyunosukeT'
 __date__ = '2016/12/9'
