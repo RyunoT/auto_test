@@ -44,69 +44,69 @@ class USB(object):
         self.com('E\r')
 
     def stop_QP3(self):
-        """発振ストップ"""
+        """全モードで発振ストップ"""
         self.com('T0\r')
 
-    def oscillator_ABorBA_setup(self, AB_BA):
-        """オシレータモードAB相/BA相セットアップ選択、ABなら0、BAなら1"""
-        self.com('G0+050\r')  #ハイレベル電圧
-        self.com('G1+000\r')  #ローレベル電圧
-        self.com('G2' + AB_BA + '\r')
-        self.com('G30\r')
-
-    def oscillator_AB_setup(self):
-        """オシレータモードAB相セットアップ、freq_testの関係で存在するムダ"""
-        self.oscillator_ABorBA_setup('0')
-
-    def oscillator_BA_setup(self):
-        """オシレータモードBA相セットアップ、freq_testの関係で存在するムダ"""
-        self.oscillator_ABorBA_setup('1')
-
-    def oscillator(self, frequency):
-        """オシレータモード出力"""
-        command = str('N0' + frequency + '\r')
-        self.com(command)
+    def oscillator(self, frequency_Hz):
+        """オシレータモードセットアップ・出力"""
+        frequency = str(int(frequency_Hz * 1000)).zfill(9)
+        self.com(str('N0' + frequency + '\r'))
         self.com('T3\r')
         time.sleep(1)  # ハードの動作時間があるので余裕を持たせる
 
     def sweep_setup(self, start_Hz, stop_Hz, sweep_time_sec, wave_mode):
-        """スイープモードセットアップ"""
-        start = str(start_Hz * 10)
-        stop = str(stop_Hz * 10)
-        sweep_time = str(sweep_time_sec * 100)
+        """スイープモードセットアップ・出力"""
+        start = str(int(start_Hz * 10)).zfill(7)
+        stop = str(int(stop_Hz * 10)).zfill(7)
+        sweep_time = str(int(sweep_time_sec * 100)).zfill(5)
         self.com('S0' + start + '\r')
         self.com('S1' + stop + '\r')
         self.com('S2' + sweep_time + '\r')
         self.com('S3' + wave_mode + '\r')  # 0:三角、1:鋸歯、2:2周波数切り替え
-
-    def sweep(self):
-        """スイープモード出力"""
         self.com('T1\r')
         time.sleep(1)  # ハードの動作時間があるので余裕を持たせる
 
     def Npulse_setup(self, frequency_Hz, pulse_count):
-        """Nパルスモードセットアップ"""
-        frequency = str(frequency_Hz * 10)
+        """Nパルスモードセットアップ・出力"""
+        frequency = str(int(frequency_Hz * 10)).zfill(5)
+        pulse_count = str(pulse_count.zfill(5))
         self.com('C0' + frequency +'\r')
         self.com('C1' + pulse_count +'\r')
-
-    def Npulse(self):
-        """スイープモード出力"""
         self.com('T2\r')
         time.sleep(1)  # ハードの動作時間があるので余裕を持たせる
 
-    def allmode_setup(self, high_V, low_V, A_B, output_mode):
-        high = str(high_V * 10)
-        low = str(low_V * 10)
-        self.com('G0' + high + '\r')
-        self.com('G1' + low + '\r')
-        self.com('G2' + A_B + '\r')  # 0:A_B進み、1:B_A遅れ
-        self.com('G3' + output_mode + '\r')  # 0:可変電圧出力、1:セミオープンコレクタ出力
+    def allmode_setup(self, high_V, low_V, AB_setup, output_mode):
+
+        def voltage_setup(voltage_V):
+            if voltage_V >= 0:
+                setup_voltage = ('+' + str(int(voltage_V* 10)).zfill(3))
+            else:
+                setup_voltage = str(int(voltage_V * 10)).zfill(4)
+            return setup_voltage
+
+        self.com('G0' + voltage_setup(high_V) + '\r')
+        self.com('G1' + voltage_setup(low_V) + '\r')
+        self.com('G2' + str(AB_setup) + '\r')  # 0:A_B進み、1:B_A遅れ
+        self.com('G3' + str(output_mode) + '\r')  # 0:可変電圧出力、1:セミオープンコレクタ出力
 
 
 if __name__ == '__main__':  # コード作成時のテスト用
     response = 0
     print(response)
+    start_Hz = 100
+    start = str(start_Hz * 10).zfill(7)
+    print(start)
+    high_V = -10
+    high = str(high_V * 10)
+    print(high.zfill(4))
+    test = USB()
+    test.serial_open('/dev/tty.usbserial-A501YZDP')
+    test.program_in()
+    test.allmode_setup(+10, -10, 0, 0)
+    test.oscillator(0.01)
+    test.program_out()
+
+
 
 __author__ = 'RyunosukeT'
 __date__ = '2016/12/9'

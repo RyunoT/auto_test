@@ -46,7 +46,7 @@ class Frequency_test(object):
 
         Frequency_test.qp3_usb.program_in()
 
-        Frequency_test.qp3_usb.oscillator_AB_setup()  # QP3をセットアップ
+        Frequency_test.qp3_usb.allmode_setup(5, 0, 0, 0)  # QP3をセットアップ
         self.TDP_input_mode_test('0')  # TDP39をテスト
 
         Frequency_test.qp3_usb.program_out()
