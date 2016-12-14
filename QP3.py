@@ -59,6 +59,7 @@ class USB(object):
         start = str(int(start_Hz * 10)).zfill(7)
         stop = str(int(stop_Hz * 10)).zfill(7)
         sweep_time = str(int(sweep_time_sec * 100)).zfill(5)
+        wave_mode = str(wave_mode).zfill(1)
         self.com('S0' + start + '\r')
         self.com('S1' + stop + '\r')
         self.com('S2' + sweep_time + '\r')
@@ -69,7 +70,7 @@ class USB(object):
     def Npulse_setup(self, frequency_Hz, pulse_count):
         """Nパルスモードセットアップ・出力"""
         frequency = str(int(frequency_Hz * 10)).zfill(5)
-        pulse_count = str(pulse_count.zfill(5))
+        pulse_count = str(int(pulse_count)).zfill(5)
         self.com('C0' + frequency +'\r')
         self.com('C1' + pulse_count +'\r')
         self.com('T2\r')
