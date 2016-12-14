@@ -181,7 +181,8 @@ oscillator()
 sweep()
 Npulse()
 quit()
-
+aaaaaaaaaaaaaa
+aaaaaaaaaaaaa
 root.mainloop()
 
 __author__ = 'RyunosukeT'
