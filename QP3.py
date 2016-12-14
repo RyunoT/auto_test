@@ -16,8 +16,8 @@ class USB(object):
     """
 
     def __init__(self):
-        self.serialport = None  # QP-3と繋がるシリアルポート
-        self.response = None  # QP-3からのレスポンス
+        self.serialport = serial.Serial()  # QP-3と繋がるシリアルポート
+        self.response = str()  # QP-3からのレスポンス
 
     def serial_open(self, port_number):
         self.serialport = serial.Serial(port=port_number, baudrate=9600, bytesize=8, parity='N',
@@ -78,8 +78,9 @@ class USB(object):
     def allmode_setup(self, high_V, low_V, AB_setup, output_mode):
 
         def voltage_setup(voltage_V):
+            """出力電圧の設定値の符号（+, -）を書き込むための関数"""
             if voltage_V >= 0:
-                setup_voltage = ('+' + str(int(voltage_V* 10)).zfill(3))
+                setup_voltage = ('+' + str(int(voltage_V * 10)).zfill(3))
             else:
                 setup_voltage = str(int(voltage_V * 10)).zfill(4)
             return setup_voltage
@@ -91,21 +92,13 @@ class USB(object):
 
 
 if __name__ == '__main__':  # コード作成時のテスト用
-    response = 0
-    print(response)
-    start_Hz = 100
-    start = str(start_Hz * 10).zfill(7)
-    print(start)
-    high_V = -10
-    high = str(high_V * 10)
-    print(high.zfill(4))
     test = USB()
     test.serial_open('/dev/tty.usbserial-A501YZDP')
+    print(type(test.serialport))
     test.program_in()
     test.allmode_setup(+10, -10, 0, 0)
     test.oscillator(0.01)
     test.program_out()
-
 
 
 __author__ = 'RyunosukeT'
