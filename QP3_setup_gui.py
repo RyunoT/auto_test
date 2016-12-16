@@ -85,7 +85,7 @@ def quit():
     button2 = tk.Button(text="Disconnect and Quit app", command=quit_command)
     button2.grid(row=6, column=1, padx=0, pady=50, sticky='')
 
-
+# main code begin
 root = tk.Tk()
 root.title("QP-3 setup Application")
 root.geometry("1600x600")
@@ -127,5 +127,5 @@ quit()
 root.mainloop()
 
 __author__ = 'RyunosukeT'
-__date__ = '2016/12/13'
-__version__ = '0.1'
+__date__ = '2016/12/16'
+__version__ = '0.2'
