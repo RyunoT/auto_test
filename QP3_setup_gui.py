@@ -13,34 +13,16 @@ import QP3
 import time
 
 
-def connect_qp3x():
-    entrybox = tk.Entry(width=20)
-    entrybox.grid(row=0, column=0, padx=10, pady=50, sticky='')
-
-    def ser():
-        """serial open"""
-        entry_input = entrybox.get()
-        try:
-            qp3.serial_open(entry_input)
-        except:
-            tkmsg.showinfo('Error', 'Port Number Error!!')
-
-    # ボタン
-    button1 = tk.Button(text='Connect QP-3X')
-    button1['command'] = ser
-    button1.grid(row=0, column=1, padx=0, pady=0, sticky='')
-
-
 class Entry_Label_Button(object):
     """left Entry right Label, and bottom Button"""
-    def __init__(self, column, row_count, label_text, button_text):
+    def __init__(self, column, row_count, label_text, button_text, button_select):
         self.qp3 = QP3.USB()
         self.column = column
         self.row_count = row_count
-        self.label_text = []
         self.label_text = label_text
-        self.entry_list = [tk.Entry(width=10)]*self.row_count
         self.button_text = button_text
+        self.button_select = button_select
+        self.entry_list = [tk.Entry(width=10)]*self.row_count
 
     def setting_entry(self):
         for row in range(self.row_count):
@@ -53,27 +35,64 @@ class Entry_Label_Button(object):
             label_list[row] = tk.Label(text=self.label_text[row])
             label_list[row].grid(row=row+1, column=self.column+1, padx=0, pady=0, sticky='w')
 
-    def setting_button(self):
+    def setting_button(self, button_select):
         entry_text = [float] * self.row_count
+        row_count = self.row_count
+        entry_list = self.entry_list
 
         def button_all():
-            for row in range(self.row_count):
-                entry_text[row] = float(self.entry_list[row].get())
-                qp3.program_in()
+            for row in range(row_count):
+                entry_text[row] = float(entry_list[row].get())
+            qp3.program_in()
+            if button_select == 0:
                 qp3.allmode_setup(entry_text[0], entry_text[1], entry_text[2], entry_text[3])
+            elif button_select == 1:
+                qp3.oscillator(entry_text[0])
+            elif button_select == 2:
+                qp3.sweep_setup(entry_text[0], entry_text[1], entry_text[2], entry_text[3])
+            elif button_select == 3:
+                qp3.Npulse_setup(entry_text[0], entry_text[1])
+            else:
+                pass
 
         button = tk.Button(text=self.button_text)
         button['command'] = button_all
         button.grid(row=5, column=self.column+1, padx=0, pady=0, sticky='')
 
     def setting_ELB(self):
+        """Entry Label Button"""
         self.setting_entry()
         self.setting_label()
-        self.setting_button()
+        self.setting_button(self.button_select)
+
+
+def connect_qp3x():
+    entrybox = tk.Entry(width=20)
+    entrybox.grid(row=0, column=0, padx=10, pady=50, sticky='')
+
+    def ser():
+        """serial open"""
+        entry_input = entrybox.get()
+        try:
+            qp3.serial_open(entry_input)
+            qp3.program_in()
+            time.sleep(1)
+            qp3.program_in()
+            print(qp3.response)
+            if qp3.response == b'OK\r\x00':
+                tkmsg.showinfo('Connect', 'Welcome to QP-3X')
+            else:
+                pass
+        except:
+            tkmsg.showinfo('Error', 'Port Number Error!!')
+
+    # ボタン
+    button1 = tk.Button(text='Connect QP-3X')
+    button1['command'] = ser
+    button1.grid(row=0, column=1, padx=0, pady=0, sticky='')
 
 
 def quit():
-    """quit"""
     def quit_command():
         try:
             qp3.program_out()
@@ -90,35 +109,40 @@ root = tk.Tk()
 root.title("QP-3 setup Application")
 root.geometry("1600x600")
 root.grid()
-qp3 = QP3.USB()
+qp3 = QP3.USB()  # using connect and quit, you should delete after making class
 
 # serial connect GUI
 connect_qp3x()
 
 # output setting GUI
-output_label = ['High(V)\r[-12.0 ~ +12.0]', 'Low(V)\r[-12.0 ~ +12.0]',
-                'AB mode\r[0:A-B, 1:B-A]', 'Output\r[0=Var.V, 1=Semi Open]']
+output_label = ['High(V)\r[-12.0 ~ +12.0]',
+                'Low(V)\r[-12.0 ~ +12.0]',
+                'AB mode\r[0:A-B, 1:B-A]',
+                'Output\r[0=Var.V, 1=Semi Open]']
 output_setup = Entry_Label_Button(column=0, row_count=4, label_text=output_label,
-                                  button_text='Output setting')
+                                  button_text='Output setting', button_select=0)
 output_setup.setting_ELB()
 
 # oscillator mode GUI
 oscillator_label = ['Oscillator(Hz)\r[0.001 ~ 600000]']
 oscillator_setup = Entry_Label_Button(column=2, row_count=1, label_text=oscillator_label,
-                                      button_text='Oscillator mode')
+                                      button_text='Oscillator mode', button_select=1)
 oscillator_setup.setting_ELB()
 
 # sweep mode GUI
-sweep_label = ['Start(Hz)\r[0.1 ~ 200000]', 'Stop(Hz)\r[0.1 ~ 200000]',
-               'Sweep time(sec)\r[0.01 ~ 999.99]', 'Wave mode\r[0=Triangle,\r1=Saw, 2=Square]']
+sweep_label = ['Start(Hz)\r[0.1 ~ 200000]',
+               'Stop(Hz)\r[0.1 ~ 200000]',
+               'Sweep time(sec)\r[0.01 ~ 999.99]',
+               'Wave mode\r[0=Triangle,\r1=Saw, 2=Square]']
 sweep_setup = Entry_Label_Button(column=4, row_count=4, label_text=sweep_label,
-                                 button_text='Sweep mode')
+                                 button_text='Sweep mode', button_select=2)
 sweep_setup.setting_ELB()
 
 # Npulse mode GUI
-npulse_label = ['Frequency(Hz)\r[0.1 ~ 3000]', 'Pulse count\r[1 ~ 60000]']
+npulse_label = ['Frequency(Hz)\r[0.1 ~ 3000]',
+                'Pulse count\r[1 ~ 60000]']
 npulse_setup = Entry_Label_Button(column=6, row_count=2, label_text=npulse_label,
-                                  button_text='Npulse mode')
+                                  button_text='Npulse mode', button_select=3)
 npulse_setup.setting_ELB()
 
 # quit button GUI

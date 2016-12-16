@@ -22,6 +22,9 @@ class USB(object):
     def serial_open(self, port_number):
         self.serialport = serial.Serial(port=port_number, baudrate=9600, bytesize=8, parity='N',
                                         stopbits=1, timeout=0.1)
+        self.serialport.read()
+        self.serialport.reset_input_buffer()
+        self.serialport.reset_output_buffer()
 
     def serial_close(self):
         self.serialport.close()
@@ -59,7 +62,7 @@ class USB(object):
         start = str(int(start_Hz * 10)).zfill(7)
         stop = str(int(stop_Hz * 10)).zfill(7)
         sweep_time = str(int(sweep_time_sec * 100)).zfill(5)
-        wave_mode = str(wave_mode).zfill(1)
+        wave_mode = str(int(wave_mode)).zfill(1)
         self.com('S0' + start + '\r')
         self.com('S1' + stop + '\r')
         self.com('S2' + sweep_time + '\r')
@@ -86,10 +89,12 @@ class USB(object):
                 setup_voltage = str(int(voltage_V * 10)).zfill(4)
             return setup_voltage
 
+        AB_setup = str(int(AB_setup))
+        output_mode = str(int(output_mode))
         self.com('G0' + voltage_setup(high_V) + '\r')
         self.com('G1' + voltage_setup(low_V) + '\r')
-        self.com('G2' + str(AB_setup) + '\r')  # 0:A_B進み、1:B_A遅れ
-        self.com('G3' + str(output_mode) + '\r')  # 0:可変電圧出力、1:セミオープンコレクタ出力
+        self.com('G2' + AB_setup + '\r')  # 0:A_B進み、1:B_A遅れ
+        self.com('G3' + output_mode + '\r')  # 0:可変電圧出力、1:セミオープンコレクタ出力
 
 
 if __name__ == '__main__':  # コード作成時のテスト用
