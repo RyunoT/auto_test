@@ -12,15 +12,8 @@ import tkinter.messagebox as tkmsg
 import QP3
 import time
 
-root = tk.Tk()
 
-
-def create_widgets():
-    # ラベル
-    # label = tk.Label(text='シリアルポート')
-    # label.grid(row=0, column=0, padx=2, pady=10, sticky='')
-
-    # エントリー
+def connect_qp3x():
     editbox = tk.Entry(width=20)
     editbox.grid(row=0, column=0, padx=10, pady=50, sticky='')
 
@@ -40,43 +33,43 @@ def create_widgets():
 
 def allmode():
     """QP3 allmode setup"""
-    allmode_edit1 = tk.Entry(width=10)
-    allmode_edit1.grid(row=1, column=0, padx=10, pady=10, sticky='e')
-    allmode_button1 = tk.Button(text="High_V")
-    allmode_button1['command'] = allmode_button1
-    allmode_button1.grid(row=1, column=1, padx=0, pady=0, sticky='w')
+    edit1 = tk.Entry(width=10)
+    edit1.grid(row=1, column=0, padx=10, pady=10, sticky='e')
+    button1 = tk.Label(text="High_V")
+    #button1['command'] = button1
+    button1.grid(row=1, column=1, padx=0, pady=0, sticky='w')
 
-    allmode_edit2 = tk.Entry(width=10)
-    allmode_edit2.grid(row=2, column=0, padx=10, pady=10, sticky='e')
-    allmode_button2 = tk.Button(text="High_V")
-    allmode_button2['command'] = allmode_button2
-    allmode_button2.grid(row=2, column=1, padx=0, pady=0, sticky='w')
+    edit2 = tk.Entry(width=10)
+    edit2.grid(row=2, column=0, padx=10, pady=10, sticky='e')
+    button2 = tk.Button(text="High_V")
+    button2['command'] = button2
+    button2.grid(row=2, column=1, padx=0, pady=0, sticky='w')
 
-    allmode_edit3 = tk.Entry(width=10)
-    allmode_edit3.grid(row=3, column=0, padx=10, pady=10, sticky='e')
-    allmode_button3 = tk.Button(text="A_B")
-    allmode_button3['command'] = allmode_button3
-    allmode_button3.grid(row=3, column=1, padx=0, pady=0, sticky='w')
+    edit3 = tk.Entry(width=10)
+    edit3.grid(row=3, column=0, padx=10, pady=10, sticky='e')
+    button3 = tk.Button(text="A_B")
+    button3['command'] = button3
+    button3.grid(row=3, column=1, padx=0, pady=0, sticky='w')
 
-    allmode_edit4 = tk.Entry(width=10)
-    allmode_edit4.grid(row=4, column=0, padx=10, pady=10, sticky='e')
-    allmode_button4 = tk.Button(text="Output_mode")
-    allmode_button4['command'] = allmode_button4
-    allmode_button4.grid(row=4, column=1, padx=0, pady=0, sticky='w')
+    edit4 = tk.Entry(width=10)
+    edit4.grid(row=4, column=0, padx=10, pady=10, sticky='e')
+    button4 = tk.Button(text="Output_mode")
+    button4['command'] = button4
+    button4.grid(row=4, column=1, padx=0, pady=0, sticky='w')
 
-    def allmode_button_all():
+    def button_all():
         """allmode setup button"""
-        allmode_input1 = float(allmode_edit1.get())
-        allmode_input2 = float(allmode_edit2.get())
-        allmode_input3 = float(allmode_edit3.get())
-        allmode_input4 = float(allmode_edit4.get())
+        input1 = float(edit1.get())
+        input2 = float(edit2.get())
+        input3 = float(edit3.get())
+        input4 = float(edit4.get())
         qp3.program_in()
-        qp3.allmode_setup(allmode_input1, allmode_input2,
-                          allmode_input3, allmode_input4)
+        qp3.setup(input1, input2,
+                          input3, input4)
 
-    allmode_button5 = tk.Button(text="Output_setup")
-    allmode_button5['command'] = allmode_button_all
-    allmode_button5.grid(row=5, column=1, padx=0, pady=0, sticky='')
+    button5 = tk.Button(text="Output_setup")
+    button5['command'] = button_all
+    button5.grid(row=5, column=1, padx=0, pady=0, sticky='')
 
 
 def oscillator():
@@ -163,11 +156,15 @@ def quit():
         try:
             qp3.program_out()
             qp3.serial_close()
-        finally:
-            root.destroy()
+        except:
+            pass
+        root.destroy()
 
     button2 = tk.Button(text="QUIT", command=quit_command)
     button2.grid(row=6, column=1, padx=0, pady=50, sticky='')
+
+
+root = tk.Tk()
 
 
 root.title("QP-3 setup Application")
@@ -175,14 +172,13 @@ root.geometry("1600x600")
 root.grid()
 
 qp3 = QP3.USB()
-create_widgets()
+connect_qp3x()
 allmode()
 oscillator()
 sweep()
 Npulse()
 quit()
-aaaaaaaaaaaaaa
-aaaaaaaaaaaaa
+
 root.mainloop()
 
 __author__ = 'RyunosukeT'
