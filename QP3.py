@@ -12,7 +12,7 @@ import time
 
 class USB(object):
     """
-    USB通信を制御するクラス、自動テスト向き
+    USB通信を制御するクラス
     """
 
     def __init__(self):
@@ -53,6 +53,7 @@ class USB(object):
     def oscillator(self, frequency_Hz):
         """オシレータモードセットアップ・出力"""
         frequency = str(int(frequency_Hz * 1000)).zfill(9)
+        self.stop_QP3()
         self.com(str('N0' + frequency + '\r'))
         self.com('T3\r')
         time.sleep(1)  # ハードの動作時間があるので余裕を持たせる
@@ -63,6 +64,7 @@ class USB(object):
         stop = str(int(stop_Hz * 10)).zfill(7)
         sweep_time = str(int(sweep_time_sec * 100)).zfill(5)
         wave_mode = str(int(wave_mode)).zfill(1)
+        self.stop_QP3()
         self.com('S0' + start + '\r')
         self.com('S1' + stop + '\r')
         self.com('S2' + sweep_time + '\r')
@@ -74,6 +76,7 @@ class USB(object):
         """Nパルスモードセットアップ・出力"""
         frequency = str(int(frequency_Hz * 10)).zfill(5)
         pulse_count = str(int(pulse_count)).zfill(5)
+        self.stop_QP3()
         self.com('C0' + frequency +'\r')
         self.com('C1' + pulse_count +'\r')
         self.com('T2\r')
@@ -100,12 +103,25 @@ class USB(object):
 if __name__ == '__main__':  # コード作成時のテスト用
     test = USB()
     test.serial_open('/dev/tty.usbserial-A501YZDP')
-    print(type(test.serialport))
+
+    test.program_in()
+    test.com('T3\r')
+    test.com('R1\r')
+    test.com('T1\r')
+    test.com('R1\r')
+    test.com('T2\r')
+    test.com('R1\r')
+
+    test.com('T3\r')
+
+    test.program_out()
+
+"""    print(type(test.serialport))
     test.program_in()
     test.allmode_setup(+10, -10, 0, 0)
     test.oscillator(0.01)
     test.program_out()
-
+"""
 
 __author__ = 'RyunosukeT'
 __date__ = '2016/12/9'

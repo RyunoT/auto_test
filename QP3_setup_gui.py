@@ -67,29 +67,27 @@ class Entry_Label_Button(object):
 
 
 def connect_qp3x():
-    entrybox = tk.Entry(width=20)
-    entrybox.grid(row=0, column=0, padx=10, pady=50, sticky='')
+    entry = tk.Entry(width=20)
+    entry.grid(row=0, column=0, padx=10, pady=50, sticky='')
 
     def ser():
         """serial open"""
-        entry_input = entrybox.get()
+        entry_input = entry.get()
         try:
             qp3.serial_open(entry_input)
             qp3.program_in()
             time.sleep(1)
-            qp3.program_in()
-            print(qp3.response)
+            qp3.program_in()  # First QP3X connection is not respond sometimes
             if qp3.response == b'OK\r\x00':
                 tkmsg.showinfo('Connect', 'Welcome to QP-3X')
             else:
                 pass
-        except:
+        except Exception:
             tkmsg.showinfo('Error', 'Port Number Error!!')
 
-    # ボタン
-    button1 = tk.Button(text='Connect QP-3X')
-    button1['command'] = ser
-    button1.grid(row=0, column=1, padx=0, pady=0, sticky='')
+    button = tk.Button(text='Connect QP-3X')
+    button['command'] = ser
+    button.grid(row=0, column=1, padx=0, pady=0, sticky='')
 
 
 def quit():
@@ -101,8 +99,8 @@ def quit():
             pass
         root.destroy()
 
-    button2 = tk.Button(text="Disconnect and Quit app", command=quit_command)
-    button2.grid(row=6, column=1, padx=0, pady=50, sticky='')
+    button = tk.Button(text="Disconnect and Quit app", command=quit_command)
+    button.grid(row=6, column=1, padx=0, pady=50, sticky='')
 
 # main code begin
 root = tk.Tk()
