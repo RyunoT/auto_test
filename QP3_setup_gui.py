@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
-QP3をセットアップするGUIを備えたアプリケーションです
+QP3XをセットアップするGUIを備えたアプリケーションです
 """
 # Date: 2016/12/13
 # Filename: qp3_setup_gui
@@ -104,7 +104,7 @@ def quit():
 
 # main code begin
 root = tk.Tk()
-root.title("QP-3 setup Application")
+root.title("QP-3X setup Application")
 root.geometry("1600x600")
 root.grid()
 qp3 = QP3.USB()  # using connect and quit, you should delete after making class
