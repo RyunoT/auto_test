@@ -11,6 +11,7 @@ import serial
 import time
 
 
+
 class RS232C(object):
     """
     RS232C通信を制御するクラス、自動テスト向き
