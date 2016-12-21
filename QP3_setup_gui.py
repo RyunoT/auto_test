@@ -107,7 +107,7 @@ root = tk.Tk()
 root.title("QP-3X setup Application")
 root.geometry("1600x600")
 root.grid()
-qp3 = QP3.USB()  # using connect and quit, you should delete after making class
+qp3 = QP3.USB()
 
 # serial connect GUI
 connect_qp3x()

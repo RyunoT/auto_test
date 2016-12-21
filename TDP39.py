@@ -79,17 +79,19 @@ class RS232C(object):
         def _float_setting(x):
             if x < 1:
                 return '%.5f' % x
+            else:
+                return int(x)
 
         input_rate = _float_setting(input_rate_Hz)
         display_rate = _float_setting(display_rate_Hz)
 
         self.write_config(1, input_rate)
         self.write_config(2, display_rate)
-        self.write_config(3, point_position)
-        self.write_config(4, display_refresh_sec)
-        self.write_config(5, moving_avg)
-        self.write_config(6, display_dynamic)
-        self.write_config(7, output)
+        self.write_config(3, int(point_position))
+        self.write_config(4, int(display_refresh_sec))
+        self.write_config(5, int(moving_avg))
+        self.write_config(6, int(display_dynamic))
+        self.write_config(7, int(output))
 
 
 
@@ -124,12 +126,9 @@ if __name__ == '__main__':  # コード作成時のテスト用
     b.serial_open('/dev/tty.usbserial-FTZ2FBLI')
     b.com('S')
     b.program_in()
-    print(str(0))
-    b.write_config(7, 0)
-    b.read_config(7)
+    b.basic_setup(1, 1, 0, 1, 1, 0, 0)
     b.program_out()
     b.serial_close()
-
 
 """    a = RS485('00')
     a.serial_open('/dev/tty.usbserial-00001014')
