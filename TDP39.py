@@ -11,16 +11,14 @@ import serial
 import time
 
 
-
-
 class RS232C(object):
     """
     RS232C通信を制御するクラス、自動テスト向き
     """
 
     def __init__(self):
-        self.serialport = None  # TDP39XXとつながるシリアルポート、オブジェクト
-        self.response = None
+        self.serialport = serial.Serial()  # TDP39XXとつながるシリアルポート、オブジェクト
+        self.response = str()
 
     def serial_open(self, port_number):
         self.serialport = serial.Serial(port=port_number, baudrate=2400, bytesize=8,
@@ -37,6 +35,15 @@ class RS232C(object):
         self.response = self.serialport.readline()
         if __name__ == '__main__':  # コード作成時のテスト用
             print(self.response)
+
+    def read_config(self, number):
+        """設定値読み込み"""
+        self.com('RP' + str(number).zfill(2) + '\r')
+
+    def write_config(self, number, str_value):
+        """設定値書き込み"""
+        self.com('WP' + str(number).zfill(2) + ','
+                 + str(str_value) + '\r')
 
     def read_only_number(self):
         """表示器の数字のみを読み込む、具体的には\r\n（CRLF）を削除する"""
@@ -66,6 +73,25 @@ class RS232C(object):
         command = str('WP30,' + mode + '\r')
         self.com(command)
 
+    def basic_setup(self, input_rate_Hz, display_rate_Hz, point_position,
+                    display_refresh_sec, moving_avg, display_dynamic, output):
+
+        def _float_setting(x):
+            if x < 1:
+                return '%.5f' % x
+
+        input_rate = _float_setting(input_rate_Hz)
+        display_rate = _float_setting(display_rate_Hz)
+
+        self.write_config(1, input_rate)
+        self.write_config(2, display_rate)
+        self.write_config(3, point_position)
+        self.write_config(4, display_refresh_sec)
+        self.write_config(5, moving_avg)
+        self.write_config(6, display_dynamic)
+        self.write_config(7, output)
+
+
 
 class RS485(RS232C):
     """RS485通信を制御するクラス、RS232Cクラスを継承、serialportとresponseを標準装備"""
@@ -94,15 +120,21 @@ class RS485(RS232C):
 
 
 if __name__ == '__main__':  # コード作成時のテスト用
-    a = RS485('00')
+    b = RS232C()
+    b.serial_open('/dev/tty.usbserial-FTZ2FBLI')
+    b.com('S')
+    b.program_in()
+    print(str(0))
+    b.write_config(7, 0)
+    b.read_config(7)
+    b.program_out()
+    b.serial_close()
+
+
+"""    a = RS485('00')
     a.serial_open('/dev/tty.usbserial-00001014')
     a.read_only_number()
     a.serial_close()
-
-"""    b = RS232C()
-    b.serial_open('/dev/tty.usbserial-FTZ2FBLI')
-    b.com('O')
-    b.serial_close()
 """
 
 __author__ = 'RyunosukeT'

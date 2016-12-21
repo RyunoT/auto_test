@@ -45,13 +45,13 @@ class Entry_Label_Button(object):
                 entry_text[row] = float(entry_list[row].get())
             qp3.program_in()
             if button_select == 0:
-                qp3.allmode_setup(entry_text[0], entry_text[1], entry_text[2], entry_text[3])
+                qp3.allmode_setup(*tuple(entry_text))
             elif button_select == 1:
-                qp3.oscillator(entry_text[0])
+                qp3.oscillator(*tuple(entry_text))
             elif button_select == 2:
-                qp3.sweep_setup(entry_text[0], entry_text[1], entry_text[2], entry_text[3])
+                qp3.sweep_setup(*tuple(entry_text))
             elif button_select == 3:
-                qp3.Npulse_setup(entry_text[0], entry_text[1])
+                qp3.Npulse_setup(*tuple(entry_text))
             else:
                 pass
 
