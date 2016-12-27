@@ -73,8 +73,8 @@ class RS232C(object):
         command = str('WP30,' + mode + '\r')
         self.com(command)
 
-    def basic_setup(self, input_rate_Hz, display_rate_Hz, point_position,
-                    display_refresh_sec, moving_avg, display_dynamic, output):
+    def basic_setup(self, input_rate_Hz, display_rate_Hz, display_refresh_sec,
+                    point_position, moving_avg, display_dynamic, output):
 
         def _float_setting(x):
             if x < 1:
@@ -85,15 +85,23 @@ class RS232C(object):
         input_rate = _float_setting(input_rate_Hz)
         display_rate = _float_setting(display_rate_Hz)
 
+        if point_position == 'Auto':
+            point_position = 0
+        if display_dynamic == 'OFF':
+            display_dynamic = 0
+
         self.write_config(1, input_rate)
         self.write_config(2, display_rate)
-        self.write_config(3, int(point_position))
         self.write_config(4, int(display_refresh_sec))
+        self.write_config(3, int(point_position))
         self.write_config(5, int(moving_avg))
         self.write_config(6, int(display_dynamic))
         self.write_config(7, int(output))
 
+    def comparator_setup(self, ):
+        pass
 
+    def
 
 class RS485(RS232C):
     """RS485通信を制御するクラス、RS232Cクラスを継承、serialportとresponseを標準装備"""
