@@ -98,10 +98,54 @@ class RS232C(object):
         self.write_config(6, int(display_dynamic))
         self.write_config(7, int(output))
 
-    def comparator_setup(self, ):
+    def comparator_setup(self):
         pass
 
-    def
+    def mode_setup(self, divide, pulse, f_or_T, hold, chattering):
+
+        _divide = str(int(divide)).zfill(3)
+
+        if pulse == 'Single':
+            pulse = 0
+        elif pulse == 'UP/DOWN':
+            pulse = 1
+        elif pulse == 'A/B':
+            pulse = 2
+        if f_or_T == 'Frequency':
+            f_or_T = 0
+        elif f_or_T == 'Period':
+            f_or_T = 1
+        if hold == 'Data':
+            hold = 0
+        elif hold == 'Peak':
+            hold = 1
+        elif hold == 'Valley':
+            hold = 2
+
+        self.write_config(31, _divide)
+        self.write_config(30, pulse)
+        self.write_config(32, f_or_T)
+        self.write_config(33, hold)
+        self.write_config(34, int(chattering))
+
+    def dual_setup(self, input_rate_Hz, display_rate_Hz, point_position):
+        def _float_setting(x):
+            if x < 1:
+                return '%.5f' % x
+            else:
+                return int(x)
+
+        input_rate = _float_setting(input_rate_Hz)
+        display_rate = _float_setting(display_rate_Hz)
+
+        if point_position == 'Auto':
+            point_position = 0
+
+        self.write_config(40, input_rate)
+        self.write_config(41, display_rate)
+        self.write_config(42, int(point_position))
+
+
 
 class RS485(RS232C):
     """RS485通信を制御するクラス、RS232Cクラスを継承、serialportとresponseを標準装備"""

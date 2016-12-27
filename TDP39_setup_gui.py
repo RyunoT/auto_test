@@ -65,17 +65,17 @@ class Entry_Combo_Check():
 
     def setting_entry(self, row_begin, row_end):
         row_count = row_end - row_begin
-        self.entry_list = [tk.Entry(width=10)] * row_count  # class val changed
         for row in range(row_count):
-            self.entry_list[row] = tk.Entry(width=10)
-            self.entry_list[row].grid(row=row + 1, column=self.column, padx=10, pady=10, sticky='e')
+            entry = tk.Entry(width=10)
+            entry.grid(row=row_begin + row + 1, column=self.column, padx=10, pady=10, sticky='e')
+            self.entry_list.append(entry)
 
     def setting_label(self, row_begin, row_end, label_text):
         row_count = row_end - row_begin
         label_list = [tk.Label] * row_count
         for row in range(row_count):
             label_list[row] = tk.Label(text=label_text[row])
-            label_list[row].grid(row=row + 1, column=self.column + 1, padx=0, pady=0, sticky='w')
+            label_list[row].grid(row=row_begin + row + 1, column=self.column + 1, padx=0, pady=0, sticky='w')
 
     def setting_radio(self, row, radio_num, radio_text, var_list):
         """No Use!!!!!"""
@@ -96,9 +96,8 @@ class Entry_Combo_Check():
         check = tk.Checkbutton(text=text, variable=boolean)
         check.grid(row=row + 1, column=self.column, padx=0, pady=5, sticky='e')
 
-    def setting_button(self, button_text):
-        """もはや個別に作ってしまった方がマシなのでは？？？継承を使えばいいかも"""
-
+    def setting_button(self, button_text, tdp39_function):
+        """tdp39_functionはTDP39.pyから引っ張ってくること"""
         entry_text = []
 
         def button_all():
@@ -119,13 +118,80 @@ class Entry_Combo_Check():
                     entry_text.append(float(0))
 
             try:
-                tdp39.basic_setup(*tuple(entry_text))
+                tdp39_function(*tuple(entry_text))
             except:
-                tkmsg.showinfo('Error', 'Please fill in ALL boxes in column')
+                # tkmsg.showinfo('Error', 'Please fill in ALL boxes in column')
+                pass
 
         button = tk.Button(text=button_text)
         button['command'] = button_all
         button.grid(row=8, column=self.column + 1, padx=0, pady=0, sticky='')
+
+
+class Comparator(Entry_Combo_Check):
+    """
+    コンパレータGUI作成用
+    """
+    def __init__(self, column):
+        Entry_Combo_Check.__init__(self, column)
+
+    def setting_combo(self, row, column, text_list):
+        combo = ttk.Combobox(values=text_list, textvariable=tk.StringVar, width=2, state='readonly')
+        combo.grid(row=row + 1, column=self.column + column, padx=0, pady=5, sticky='e')
+        self.combo_list.append(combo)
+
+    def setting_entry(self, row_begin, row_end, column):
+        row_count = row_end - row_begin
+        for row in range(row_count):
+            entry = tk.Entry(width=10)
+            entry.grid(row=row_begin + row + 1, column=self.column + column, padx=10, pady=10, sticky='e')
+            self.entry_list.append(entry)
+
+
+    def setting_label(self, row_begin, row_end, column, w_or_e, label_text):
+        row_count = row_end - row_begin
+        label_list = [tk.Label] * row_count
+        for row in range(row_count):
+            label_list[row] = tk.Label(text=label_text[row])
+            label_list[row].grid(row=row_begin + row + 1, column=self.column + column, padx=0, pady=0, sticky=w_or_e)
+
+    def setting_combo2(self, row, column, text_list):
+        combo = ttk.Combobox(values=text_list, textvariable=tk.StringVar, width=8, state='readonly')
+        combo.grid(row=row + 1, column=self.column + column, columnspan=2, padx=0, pady=5, sticky='e')
+        self.combo_list.append(combo)
+
+    def setting_button(self, button_text, tdp39_function):
+        """tdp39_functionはTDP39.pyから引っ張ってくること"""
+        entry_text = []
+
+        def button_all():
+            """entry, combo, check の順番は固定、変えるならfor if の文"""
+            del entry_text[:]
+
+            for row in range(len(self.entry_list)):
+                entry_text.append(float(self.entry_list[row].get()))
+
+            for row in range(len(self.combo_list)):
+                """if you get str, must change TDP39.py"""
+                entry_text.append(self.combo_list[row].get())
+
+            for row in range(len(self.boolean_list)):
+                if self.boolean_list[row].get():
+                    entry_text.append(float(1))
+                else:
+                    entry_text.append(float(0))
+
+            try:
+                print(entry_text)
+                tdp39_function(*tuple(entry_text))
+            except:
+                # tkmsg.showinfo('Error', 'Please fill in ALL boxes in column')
+                pass
+
+        button = tk.Button(text=button_text)
+        button['command'] = button_all
+        button.grid(row=8, column=self.column + 1, columnspan=3, padx=0, pady=0, sticky='')
+
 
 
 
@@ -140,7 +206,7 @@ tdp39 = TDP39.RS232C()  # MUST be global !!!!!!!
 widget = Widgets()
 widget.connect_tdp39()
 
-# column0-1
+# column 0-1
 c0 = Entry_Combo_Check(0)
 c0_label_text = ['Input rate(Hz)\r[0.00001 ~ 999999]',
                  'Display rate(Hz)\r[0.00001 ~ 999999]',
@@ -157,11 +223,60 @@ c0.setting_combo(4, c0_combo_text1)
 c0_combo_text2 = ['OFF', '1', '2', '3', '4', '5', '6', '7']
 c0.setting_combo(5, c0_combo_text2)
 c0.setting_check(6, 'Output')
-
-c0.setting_button('Basic config')
-
+c0.setting_button('Basic config', tdp39.basic_setup)
 
 
+# column 2-3
+c1 = Entry_Combo_Check(2)
+c1_label_text = ['Divide(count)\r[1 ~ 999]',
+                 'Input Pulse',
+                 'f or T',
+                 'Hold mode',
+                 'Chattering Suppression']
+c1.setting_label(0, 4, c1_label_text)
+c1.setting_entry(0, 1)
+c1_combo_pulse = ['Single', 'UP/DOWN', 'A/B']
+c1_combo_f_or_T = ['Frequency', 'Period']
+c1_combo_hold = ['Data', 'Peak', 'Valley']
+c1.setting_combo(1, c1_combo_pulse)
+c1.setting_combo(2, c1_combo_f_or_T)
+c1.setting_combo(3, c1_combo_hold)
+c1.setting_check(4, 'Chattering\rSuppression')
+c1.setting_button('Mode Config', tdp39.mode_setup)
+
+
+# column 4-5
+c2 = Entry_Combo_Check(4)
+c2_label_text = ['Input rate(Hz)\r[0.00001 ~ 999999]',
+                 'Display rate(Hz)\r[0.00001 ~ 999999]',
+                 'Point\r[1 ~ 6: Static]']
+c2.setting_label(0, 3, c2_label_text)
+c2.setting_entry(0, 2)
+c2_combo_text0 = ['Auto', '1', '2', '3', '4', '5', '6']
+c2.setting_combo(2, c2_combo_text0)
+c2.setting_button('Dual Range Config', tdp39.dual_setup)
+
+
+# column 6-9
+c3 = Comparator(6)
+c3.setting_label(0, 1, 0, 'e', ['     If Input '])
+c3.setting_combo(0, 1, ['≦', '≧'])
+c3.setting_entry(0, 1, 2)
+c3.setting_label(0, 1, 3, 'w', ['Hz'])
+c3.setting_label(1, 2, 2, 'e', ['Comp High = '])
+c3.setting_combo(1, 3, ['+V', '-V'])
+
+c3.setting_label(2, 3, 0, 'e', ['     If Input '])
+c3.setting_combo(2, 1, ['≦', '≧'])
+c3.setting_entry(2, 3, 2)
+c3.setting_label(2, 3, 3, 'w', ['Hz'])
+c3.setting_label(3, 4, 2, 'e', ['Comp Low = '])
+c3.setting_combo(3, 3, ['+V', '-V'])
+c3.setting_combo2(4, 0, ['Display', 'Analog Out'])
+c3.setting_label(4, 5, 2, 'w', ['Comp Sync'])
+c3.setting_button('Comparator Config', tdp39.comparator_setup)
+
+#c3.setting_combo()
 
 # quit button GUI
 widget.quit()
