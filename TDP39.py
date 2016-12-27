@@ -9,6 +9,7 @@ TDP-39XXのUSB通信制御用プログラムです
 
 import serial
 import time
+import csv
 
 
 class RS232C(object):
@@ -39,6 +40,7 @@ class RS232C(object):
     def read_config(self, number):
         """設定値読み込み"""
         self.com('RP' + str(number).zfill(2) + '\r')
+        print(self.response)
 
     def write_config(self, number, str_value):
         """設定値書き込み"""
@@ -153,6 +155,32 @@ class RS232C(object):
         self.write_config(41, display_rate)
         self.write_config(42, int(point_position))
 
+    def all_read_config(self):
+        config_list = []
+        number = []
+
+        for i in range(60):
+
+            self.read_config(i)
+            if self.response != b'?\r\n':
+                number.append(i)
+                config_list.append(self.response)
+
+        config_list = [i.decode() for i in config_list]
+        config_list = [str(i).strip('\r\n') for i in config_list]
+        config_dict = dict(zip(number, config_list))
+#        print(config_dict)
+
+        header = ['key', 'num']
+
+        with open('config.csv', 'w') as csvfile:
+            writer = csv.DictWriter(csvfile, header, extrasaction='ignore')
+            writer.writeheader()
+            for i in config_dict:
+                writer.writerow({'key': i, 'num': config_dict[i]})
+
+
+
 
 
 class RS485(RS232C):
@@ -183,16 +211,12 @@ class RS485(RS232C):
 
 if __name__ == '__main__':  # コード作成時のテスト用
     c = RS232C()
-    print(c.float_setting(100000))
+    c.serial_open('/dev/tty.usbserial-FTZ2FBLI')
+    c.program_in()
+    c.all_read_config()
+    c.program_out()
+    c.serial_close()
 
-"""    b = RS232C()
-    b.serial_open('/dev/tty.usbserial-FTZ2FBLI')
-    b.com('S')
-    b.program_in()
-    b.basic_setup(1, 1, 0, 1, 1, 0, 0)
-    b.program_out()
-    b.serial_close()
-"""
 """    a = RS485('00')
     a.serial_open('/dev/tty.usbserial-00001014')
     a.read_only_number()
