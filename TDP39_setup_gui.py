@@ -182,7 +182,6 @@ class Comparator(Entry_Combo_Check):
                     entry_text.append(float(0))
 
             try:
-                print(entry_text)
                 tdp39_function(*tuple(entry_text))
             except:
                 # tkmsg.showinfo('Error', 'Please fill in ALL boxes in column')
@@ -260,14 +259,14 @@ c2.setting_button('Dual Range Config', tdp39.dual_setup)
 # column 6-9
 c3 = Comparator(6)
 c3.setting_label(0, 1, 0, 'e', ['     If Input '])
-c3.setting_combo(0, 1, ['≦', '≧'])
+c3.setting_combo(0, 1, ['≤', '≥'])
 c3.setting_entry(0, 1, 2)
 c3.setting_label(0, 1, 3, 'w', ['Hz'])
 c3.setting_label(1, 2, 2, 'e', ['Comp High = '])
 c3.setting_combo(1, 3, ['+V', '-V'])
 
 c3.setting_label(2, 3, 0, 'e', ['     If Input '])
-c3.setting_combo(2, 1, ['≦', '≧'])
+c3.setting_combo(2, 1, ['≤', '≥'])
 c3.setting_entry(2, 3, 2)
 c3.setting_label(2, 3, 3, 'w', ['Hz'])
 c3.setting_label(3, 4, 2, 'e', ['Comp Low = '])

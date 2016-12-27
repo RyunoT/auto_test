@@ -73,17 +73,20 @@ class RS232C(object):
         command = str('WP30,' + mode + '\r')
         self.com(command)
 
+    def float_setting(self, x):
+        """floatを小数点下5桁に揃える関数"""
+        if x < 10:
+            return str('%.5f' % x)
+        elif x > 99999:
+            return str(int(x))
+        else:
+            return str(float(x))
+
     def basic_setup(self, input_rate_Hz, display_rate_Hz, display_refresh_sec,
                     point_position, moving_avg, display_dynamic, output):
 
-        def _float_setting(x):
-            if x < 1:
-                return '%.5f' % x
-            else:
-                return int(x)
-
-        input_rate = _float_setting(input_rate_Hz)
-        display_rate = _float_setting(display_rate_Hz)
+        input_rate = self.float_setting(input_rate_Hz)
+        display_rate = self.float_setting(display_rate_Hz)
 
         if point_position == 'Auto':
             point_position = 0
@@ -98,8 +101,19 @@ class RS232C(object):
         self.write_config(6, int(display_dynamic))
         self.write_config(7, int(output))
 
-    def comparator_setup(self):
-        pass
+    def comparator_setup(self, high_Hz, low_Hz, high_co, high_V,
+                         low_co, low_V, sync):
+        high = self.float_setting(high_Hz)
+        low = self.float_setting(low_Hz)
+        combo1 = {'≤': str(0), '≥': str(1)}
+        combo2 = {'+V': str(0), '-V': str(1)}
+        combo3 = {'Display': str(0), 'Analog Out': str(1)}
+
+        self.write_config(20, combo1[high_co] + combo2[high_V])
+        self.write_config(21, high)
+        self.write_config(23, combo1[low_co] + combo2[low_V])
+        self.write_config(24, low)
+        self.write_config(26, combo3[sync])
 
     def mode_setup(self, divide, pulse, f_or_T, hold, chattering):
 
@@ -129,14 +143,8 @@ class RS232C(object):
         self.write_config(34, int(chattering))
 
     def dual_setup(self, input_rate_Hz, display_rate_Hz, point_position):
-        def _float_setting(x):
-            if x < 1:
-                return '%.5f' % x
-            else:
-                return int(x)
-
-        input_rate = _float_setting(input_rate_Hz)
-        display_rate = _float_setting(display_rate_Hz)
+        input_rate = self.float_setting(input_rate_Hz)
+        display_rate = self.float_setting(display_rate_Hz)
 
         if point_position == 'Auto':
             point_position = 0
@@ -174,14 +182,17 @@ class RS485(RS232C):
 
 
 if __name__ == '__main__':  # コード作成時のテスト用
-    b = RS232C()
+    c = RS232C()
+    print(c.float_setting(100000))
+
+"""    b = RS232C()
     b.serial_open('/dev/tty.usbserial-FTZ2FBLI')
     b.com('S')
     b.program_in()
     b.basic_setup(1, 1, 0, 1, 1, 0, 0)
     b.program_out()
     b.serial_close()
-
+"""
 """    a = RS485('00')
     a.serial_open('/dev/tty.usbserial-00001014')
     a.read_only_number()
