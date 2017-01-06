@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
 QP-3(X)のUSB通信制御用プログラムです

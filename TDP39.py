@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
 TDP-39XXのUSB通信制御用プログラムです
@@ -169,7 +168,6 @@ class RS232C(object):
         config_list = [i.decode() for i in config_list]
         config_list = [str(i).strip('\r\n') for i in config_list]
         config_dict = dict(zip(number, config_list))
-#        print(config_dict)
 
         header = ['key', 'num']
 

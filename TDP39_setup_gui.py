@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding:utf-8 -*-
 """
 TDP-39XX setup application
@@ -147,7 +146,6 @@ class Comparator(Entry_Combo_Check):
             entry.grid(row=row_begin + row + 1, column=self.column + column, padx=10, pady=10, sticky='e')
             self.entry_list.append(entry)
 
-
     def setting_label(self, row_begin, row_end, column, w_or_e, label_text):
         row_count = row_end - row_begin
         label_list = [tk.Label] * row_count
@@ -192,6 +190,12 @@ class Comparator(Entry_Combo_Check):
         button.grid(row=8, column=self.column + 1, columnspan=3, padx=0, pady=0, sticky='')
 
 
+class Setting(object):
+    """
+    Setting read and write
+    """
+    def read_config(self):
+        pass
 
 
 # main code begin
@@ -274,8 +278,6 @@ c3.setting_combo(3, 3, ['+V', '-V'])
 c3.setting_combo2(4, 0, ['Display', 'Analog Out'])
 c3.setting_label(4, 5, 2, 'w', ['Comp Sync'])
 c3.setting_button('Comparator Config', tdp39.comparator_setup)
-
-#c3.setting_combo()
 
 # quit button GUI
 widget.quit()
