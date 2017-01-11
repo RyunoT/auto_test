@@ -101,7 +101,6 @@ class USB(object):
         self.com('G3' + output_mode + '\r')  # 0:可変電圧出力、1:セミオープンコレクタ出力
 
     def all_read_config(self):
-        number = []
         st = b''
 
         self.com('T3\r')
@@ -116,16 +115,16 @@ class USB(object):
         self.com('T3\r')
         st_list = st.decode().replace('\r\x00', '').split(',')
         config_list = st_list[1:6] + st_list[11:15] + st_list[20:23]
-        key_list = ['High(V)',
-                    'Low(V)',
+        key_list = ['High(V*10)',
+                    'Low(V*10)',
                     'AB mode',
                     'Output',
-                    'Oscillator(Hz)',
-                    'Start(Hz)',
-                    'Stop(Hz)',
-                    'Sweep time(sec)',
+                    'Oscillator(Hz*1000)',
+                    'Start(Hz*10)',
+                    'Stop(Hz*10)',
+                    'Sweep time(sec*10)',
                     'Wave mode',
-                    'Frequency(Hz)',
+                    'Frequency(Hz*10)',
                     'Pulse count']
         header = ['key', 'value']
 

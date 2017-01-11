@@ -31,11 +31,6 @@ class Entry_Label_Button(object):
             self.entry_list[row] = tk.Entry(width=10)
             self.entry_list[row].grid(row=row+1, column=self.column, padx=10, pady=10, sticky='e')
 
-    def import_entry(self, key_list):
-        for i in range(len(self.entry_list)):
-            self.entry_list[i].delete(0)
-            self.entry_list[i].insert(0, config_dict[key_list[i]])  # config_dict is global
-
     def setting_label(self):
         label_list = [tk.Label]*self.row_count
         for row in range(self.row_count):
@@ -72,6 +67,11 @@ class Entry_Label_Button(object):
         self.setting_label()
         self.setting_button(self.button_select)
 
+    def import_entry(self, key_list):
+        for i in range(len(self.entry_list)):
+            self.entry_list[i].delete(0)
+            self.entry_list[i].insert(0, config_dict[key_list[i]])  # config_dict is global
+
 
 def connect_qp3x():
     entry = tk.Entry(width=20)
@@ -89,10 +89,19 @@ def connect_qp3x():
                 tkmsg.showinfo('Connect', 'Welcome to QP-3X')
                 qp3.all_read_config()
 
+                global config_dict
+
                 with open("QP3X_config.csv", "r") as f:
                     global config_dict
                     config_dict = dict(csv.reader(f))
 
+                config_dict['High(V*10)'] = int(config_dict['High(V*10)']) / 10
+                config_dict['Low(V*10)'] = int(config_dict['Low(V*10)']) / 10
+                config_dict['Oscillator(Hz*1000)'] = int(config_dict['Oscillator(Hz*1000)']) / 1000
+                config_dict['Start(Hz*10)'] = int(config_dict['Start(Hz*10)']) / 10
+                config_dict['Stop(Hz*10)'] = int(config_dict['Stop(Hz*10)']) / 10
+                config_dict['Sweep time(sec*10)'] = int(config_dict['Sweep time(sec*10)']) / 10
+                config_dict['Frequency(Hz*10)'] = int(config_dict['Frequency(Hz*10)']) / 10
                 import_config_to_app()
 
             else:
@@ -107,6 +116,7 @@ def connect_qp3x():
 
 def quit():
     def quit_command():
+        qp3.all_read_config()
         try:
             qp3.program_out()
             qp3.serial_close()
@@ -165,10 +175,10 @@ quit()
 
 # import all Entry
 def import_config_to_app():
-    a = ['High(V)', 'Low(V)', 'AB mode', 'Output']
-    b = ['Oscillator(Hz)']
-    c = ['Start(Hz)', 'Stop(Hz)', 'Sweep time(sec)', 'Wave mode']
-    d = ['Frequency(Hz)', 'Pulse count']
+    a = ['High(V*10)', 'Low(V*10)', 'AB mode', 'Output']
+    b = ['Oscillator(Hz*1000)']
+    c = ['Start(Hz*10)', 'Stop(Hz*10)', 'Sweep time(sec*10)', 'Wave mode']
+    d = ['Frequency(Hz*10)', 'Pulse count']
     output_setup.import_entry(key_list=a)
     oscillator_setup.import_entry(key_list=b)
     sweep_setup.import_entry(key_list=c)
