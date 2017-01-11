@@ -129,7 +129,7 @@ class USB(object):
         header = ['key', 'value']
 
         with open('QP3X_config.csv', 'w') as csvfile:
-            writer = csv.writer(csvfile)
+            writer = csv.writer(csvfile, lineterminator='\n')  # windows OS needs lineterminator
             writer.writerow(header)
             writer.writerows([k, v] for (k, v) in zip(key_list, config_list))
 
