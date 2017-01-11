@@ -8,9 +8,12 @@ QP3XをセットアップするGUIを備えたアプリケーションです
 import sys
 import tkinter as tk
 import tkinter.messagebox as tkmsg
+import tkinter.filedialog as tkfd
 import QP3
 import time
 import csv
+import shutil
+import os
 
 config_dict = {}
 
@@ -68,6 +71,7 @@ class Entry_Label_Button(object):
         self.setting_button(self.button_select)
 
     def import_entry(self, key_list):
+        """Import csv to entry box"""
         for i in range(len(self.entry_list)):
             self.entry_list[i].delete(0)
             self.entry_list[i].insert(0, config_dict[key_list[i]])  # config_dict is global
@@ -116,8 +120,8 @@ def connect_qp3x():
 
 def quit():
     def quit_command():
-        qp3.all_read_config()
         try:
+            qp3.all_read_config()
             qp3.program_out()
             qp3.serial_close()
         except:
@@ -126,6 +130,19 @@ def quit():
 
     button = tk.Button(text="Disconnect and Quit app", command=quit_command)
     button.grid(row=6, column=1, padx=0, pady=50, sticky='')
+
+def csv_save():
+    """csv saving button"""
+    button = tk.Button(text='Making CSV file')
+
+    def dialog():
+        qp3.all_read_config()
+        file_name = tkfd.asksaveasfilename(filetypes=[('CSV Files', '*.csv')], defaultextension='csv')
+        print(file_name)
+        shutil.copyfile(src='QP3X_config.csv', dst=file_name)
+
+    button['command'] = dialog
+    button.grid(row=0, column=6, padx=0, pady=0, sticky='')
 
 
 # main code begin
@@ -171,6 +188,9 @@ npulse_setup.setting_ELB()
 
 # quit button GUI
 quit()
+
+# csv button GUI
+csv_save()
 
 
 # import all Entry
