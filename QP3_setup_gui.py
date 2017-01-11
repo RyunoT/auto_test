@@ -10,6 +10,9 @@ import tkinter as tk
 import tkinter.messagebox as tkmsg
 import QP3
 import time
+import csv
+
+config_dict = {}
 
 
 class Entry_Label_Button(object):
@@ -27,6 +30,11 @@ class Entry_Label_Button(object):
         for row in range(self.row_count):
             self.entry_list[row] = tk.Entry(width=10)
             self.entry_list[row].grid(row=row+1, column=self.column, padx=10, pady=10, sticky='e')
+
+    def import_entry(self, key_list):
+        for i in range(len(self.entry_list)):
+            self.entry_list[i].delete(0)
+            self.entry_list[i].insert(0, config_dict[key_list[i]])  # config_dict is global
 
     def setting_label(self):
         label_list = [tk.Label]*self.row_count
@@ -79,6 +87,14 @@ def connect_qp3x():
             qp3.program_in()  # First QP3X connection is not respond sometimes
             if qp3.response == b'OK\r\x00':
                 tkmsg.showinfo('Connect', 'Welcome to QP-3X')
+                qp3.all_read_config()
+
+                with open("QP3X_config.csv", "r") as f:
+                    global config_dict
+                    config_dict = dict(csv.reader(f))
+
+                import_config_to_app()
+
             else:
                 pass
         except Exception:
@@ -100,6 +116,7 @@ def quit():
 
     button = tk.Button(text="Disconnect and Quit app", command=quit_command)
     button.grid(row=6, column=1, padx=0, pady=50, sticky='')
+
 
 # main code begin
 root = tk.Tk()
@@ -144,6 +161,18 @@ npulse_setup.setting_ELB()
 
 # quit button GUI
 quit()
+
+
+# import all Entry
+def import_config_to_app():
+    a = ['High(V)', 'Low(V)', 'AB mode', 'Output']
+    b = ['Oscillator(Hz)']
+    c = ['Start(Hz)', 'Stop(Hz)', 'Sweep time(sec)', 'Wave mode']
+    d = ['Frequency(Hz)', 'Pulse count']
+    output_setup.import_entry(key_list=a)
+    oscillator_setup.import_entry(key_list=b)
+    sweep_setup.import_entry(key_list=c)
+    npulse_setup.import_entry(key_list=d)
 
 root.mainloop()
 

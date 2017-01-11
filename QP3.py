@@ -7,6 +7,8 @@ QP-3(X)のUSB通信制御用プログラムです
 
 import serial
 import time
+import collections
+import csv
 
 
 class USB(object):
@@ -98,21 +100,50 @@ class USB(object):
         self.com('G2' + AB_setup + '\r')  # 0:A_B進み、1:B_A遅れ
         self.com('G3' + output_mode + '\r')  # 0:可変電圧出力、1:セミオープンコレクタ出力
 
+    def all_read_config(self):
+        number = []
+        st = b''
+
+        self.com('T3\r')
+        self.com('R1\r')
+        st += self.response
+        self.com('T1\r')
+        self.com('R1\r')
+        st += b',' + self.response
+        self.com('T2\r')
+        self.com('R1\r')
+        st += b',' + self.response
+        self.com('T3\r')
+        st_list = st.decode().replace('\r\x00', '').split(',')
+        config_list = st_list[1:6] + st_list[11:15] + st_list[20:23]
+        key_list = ['High(V)',
+                    'Low(V)',
+                    'AB mode',
+                    'Output',
+                    'Oscillator(Hz)',
+                    'Start(Hz)',
+                    'Stop(Hz)',
+                    'Sweep time(sec)',
+                    'Wave mode',
+                    'Frequency(Hz)',
+                    'Pulse count']
+        header = ['key', 'value']
+
+        with open('QP3X_config.csv', 'w') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(header)
+            writer.writerows([k, v] for (k, v) in zip(key_list, config_list))
+
+
+
+
 
 if __name__ == '__main__':  # コード作成時のテスト用
     test = USB()
     test.serial_open('/dev/tty.usbserial-A501YZDP')
 
     test.program_in()
-    test.com('T3\r')
-    test.com('R1\r')
-    test.com('T1\r')
-    test.com('R1\r')
-    test.com('T2\r')
-    test.com('R1\r')
-
-    test.com('T3\r')
-
+    test.all_read_config()
     test.program_out()
 
 """    print(type(test.serialport))
