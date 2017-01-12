@@ -104,7 +104,7 @@ def connect_qp3x():
                 config_dict['Oscillator(Hz*1000)'] = int(config_dict['Oscillator(Hz*1000)']) / 1000
                 config_dict['Start(Hz*10)'] = int(config_dict['Start(Hz*10)']) / 10
                 config_dict['Stop(Hz*10)'] = int(config_dict['Stop(Hz*10)']) / 10
-                config_dict['Sweep time(sec*10)'] = int(config_dict['Sweep time(sec*10)']) / 10
+                config_dict['Sweep time(sec*10)'] = int(config_dict['Sweep time(sec*10)']) / 100
                 config_dict['Frequency(Hz*10)'] = int(config_dict['Frequency(Hz*10)']) / 10
                 import_config_to_app()
 
