@@ -197,7 +197,7 @@ csv_save()
 def import_config_to_app():
     a = ['High(V*10)', 'Low(V*10)', 'AB mode', 'Output']
     b = ['Oscillator(Hz*1000)']
-    c = ['Start(Hz*10)', 'Stop(Hz*10)', 'Sweep time(sec*10)', 'Wave mode']
+    c = ['Start(Hz*10)', 'Stop(Hz*10)', 'Sweep time(sec*100)', 'Wave mode']
     d = ['Frequency(Hz*10)', 'Pulse count']
     output_setup.import_entry(key_list=a)
     oscillator_setup.import_entry(key_list=b)
